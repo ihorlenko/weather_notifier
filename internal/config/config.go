@@ -45,7 +45,8 @@ type WeatherAPIConfig struct {
 func LoadConfig() *Config {
 	return &Config{
 		AppConfig: AppConfig{
-			Port: "8080",
+			BaseURL: getEnv("BASE_URL", "http://localhost:8080"),
+			Port:    "8080",
 		},
 
 		DBConfig: DBConfig{
