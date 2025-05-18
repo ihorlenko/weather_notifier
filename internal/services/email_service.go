@@ -63,7 +63,7 @@ To unsubscribe from notificetions visit the link:
 
 Kind regards,
 Weather Notifier Team
-`, city, weather.Temperature, weather.Humidity*100, weather.Description, unsubscribeURL)
+`, city, weather.Temperature, weather.Humidity, weather.Description, unsubscribeURL)
 
 	return s.sendEmail(email, subject, body)
 }
