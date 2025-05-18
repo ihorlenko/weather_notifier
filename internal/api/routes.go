@@ -10,4 +10,5 @@ func SetupRoutes(router *gin.Engine) {
 	{
 		v1.GET("/ping", handlers.PingHandler)
 	}
+	router.Static("/static", "./web")
 }
