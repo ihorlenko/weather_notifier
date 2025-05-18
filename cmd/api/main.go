@@ -70,7 +70,12 @@ func main() {
 	router.Static("/static", "./web/static")
 	router.StaticFile("/", "./web/index.html")
 
-	if err := router.Run(":" + cfg.AppConfig.Port); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
-	}
+	go func() {
+		if err := router.Run(":" + cfg.AppConfig.Port); err != nil {
+			log.Fatalf("Failed to start server: %v", err)
+		}
+	}()
+
+	<-quit
+	weatherScheduler.Stop()
 }
