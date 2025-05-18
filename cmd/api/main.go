@@ -11,9 +11,12 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ihorlenko/weather_notifier/internal/api"
+	"github.com/ihorlenko/weather_notifier/internal/api/handlers"
 	"github.com/ihorlenko/weather_notifier/internal/config"
 	"github.com/ihorlenko/weather_notifier/internal/database"
+	"github.com/ihorlenko/weather_notifier/internal/repositories"
+	"github.com/ihorlenko/weather_notifier/internal/scheduler"
+	"github.com/ihorlenko/weather_notifier/internal/services"
 )
 
 // @title           Weather Notifier API
@@ -29,10 +32,26 @@ func main() {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
 
-	_, err := database.NewDBConnection(cfg)
+	db, err := database.NewDBConnection(cfg)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
+
+	userRepo := repositories.NewUserRepository(db)
+	subscriptionRepo := repositories.NewSubscriptionRepository(db)
+
+	weatherService := services.NewWeatherService(cfg)
+	emailService := services.NewEmailService(cfg)
+	subscriptionService := services.NewSubscriptionService(userRepo, subscriptionRepo)
+
+	weatherHandler := handlers.NewWeatherHandler(weatherService)
+	subscriptionHandler := handlers.NewSubscriptionHandler(subscriptionService, emailService, weatherService)
+
+	weatherScheduler := scheduler.NewWeatherScheduler(subscriptionRepo, weatherService, emailService)
+
+	weatherScheduler.Start()
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
 	router := gin.Default()
 
