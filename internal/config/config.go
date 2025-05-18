@@ -9,10 +9,19 @@ type Config struct {
 	AppConfig        AppConfig
 	DBConfig         DBConfig
 	WeatherAPIConfig WeatherAPIConfig
+	EmailConfig      EmailConfig
 }
 
 type AppConfig struct {
-	Port string
+	BaseURL string
+	Port    string
+}
+
+type EmailConfig struct {
+	From     string
+	Password string
+	SMTPHost string
+	SMTPPort string
 }
 
 type DBConfig struct {
@@ -50,6 +59,13 @@ func LoadConfig() *Config {
 
 		WeatherAPIConfig: WeatherAPIConfig{
 			APIKey: getEnv("WEATHER_API_KEY", ""),
+		},
+
+		EmailConfig: EmailConfig{
+			From:     getEnv("EMAIL_FROM", ""),
+			Password: getEnv("EMAIL_PASSWORD", ""),
+			SMTPHost: getEnv("EMAIL_SMTP_HOST", "smtp.gmail.com"),
+			SMTPPort: getEnv("EMAIL_SMTP_PORT", "587"),
 		},
 	}
 }
