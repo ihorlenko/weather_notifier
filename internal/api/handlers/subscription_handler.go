@@ -126,19 +126,20 @@ func (h *SubscriptionHandler) Confirm(c *gin.Context) {
 func (h *SubscriptionHandler) Unsubscribe(c *gin.Context) {
 	token := c.Param("token")
 	if token == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Token is required"})
+		redirectURL := "/?message_type=error&message=" + url.QueryEscape("Token is required")
+		c.Redirect(http.StatusFound, redirectURL)
 		return
 	}
 
 	err := h.subscriptionService.Unsubscribe(token)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		redirectURL := "/?message_type=error&message=" + url.QueryEscape(err.Error())
+		c.Redirect(http.StatusFound, redirectURL)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Successfully unsubscribed",
-	})
+	redirectURL := "/?message_type=success&message=" + url.QueryEscape("You have successfully unsubscribed from weather updates")
+	c.Redirect(http.StatusFound, redirectURL)
 }
 
 func isValidEmail(email string) bool {
