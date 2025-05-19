@@ -2,6 +2,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('subscription-form');
     const messageElement = document.getElementById('message');
     
+    const urlParams = new URLSearchParams(window.location.search);
+    const messageType = urlParams.get('message_type');
+    const messageText = urlParams.get('message');
+    
+    if (messageText && messageType) {
+        showMessage(decodeURIComponent(messageText), messageType);
+        
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    }
+    
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         
