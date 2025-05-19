@@ -50,7 +50,7 @@ func LoadConfig() *Config {
 		},
 
 		DBConfig: DBConfig{
-			Host:     "postgres",
+			Host:     getEnv("POSTGRES_HOST", "postgres"),
 			Port:     "5432",
 			User:     getEnv("POSTGRES_USER", "postgres"),
 			Password: getEnv("POSTGRES_PASSWORD", "postgres"),
