@@ -8,7 +8,7 @@ services:
     healthCheckPath: /ping
     envVars:
       - key: POSTGRES_USER
-        sync: false
+        value: ihorlenko
       - key: POSTGRES_PASSWORD
         sync: false
       - key: POSTGRES_DB
@@ -24,13 +24,10 @@ services:
       - key: EMAIL_SMTP_PORT
         value: 587
       - key: BASE_URL
-        fromService:
-          name: weather-notifier
-          type: web
-          property: url
+        value: https://weather-notifier.onrender.com
 
 databases:
   - name: weather-notifier-db
     plan: free
     databaseName: weather_api
-    user: postgres
+    ipAllowList: []
