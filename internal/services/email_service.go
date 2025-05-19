@@ -78,5 +78,38 @@ func (s *EmailService) sendEmail(to, subject, body string) error {
 
 	addr := fmt.Sprintf("%s:%s", s.smtpHost, s.smtpPort)
 
-	return smtp.SendMail(addr, auth, s.from, []string{to}, []byte(msg))
+	return smtp.SendMail(addr, auth, s.from, []string{to}, []byte(message))
+}
+
+func getWeatherEmoji(description string) string {
+	description = strings.ToLower(description)
+
+	switch {
+	case strings.Contains(description, "clear") || strings.Contains(description, "sunny"):
+		return "☀️"
+	case strings.Contains(description, "partly cloudy"):
+		return "⛅"
+	case strings.Contains(description, "cloudy") || strings.Contains(description, "overcast"):
+		return "☁️"
+	case strings.Contains(description, "rain") && strings.Contains(description, "thunder"):
+		return "⛈️"
+	case strings.Contains(description, "thunder") || strings.Contains(description, "lightning"):
+		return "🌩️"
+	case strings.Contains(description, "drizzle") || strings.Contains(description, "light rain"):
+		return "🌦️"
+	case strings.Contains(description, "rain"):
+		return "🌧️"
+	case strings.Contains(description, "snow") && strings.Contains(description, "rain"):
+		return "🌨️"
+	case strings.Contains(description, "snow"):
+		return "❄️"
+	case strings.Contains(description, "sleet"):
+		return "🌨️"
+	case strings.Contains(description, "fog") || strings.Contains(description, "mist"):
+		return "🌫️"
+	case strings.Contains(description, "wind"):
+		return "💨"
+	default:
+		return "🌡️"
+	}
 }
