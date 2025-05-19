@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: weather-notifier
+    env: docker
+    repo: https://github.com/ihorlenko/weather_notifier
+    dockerfilePath: ./Dockerfile
+    dockerCommand: /weather-api
+    healthCheckPath: /ping
+    envVars:
+      - key: POSTGRES_USER
+        sync: false
+      - key: POSTGRES_PASSWORD
+        sync: false
+      - key: POSTGRES_DB
+        value: weather_api
+      - key: WEATHER_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false
+      - key: EMAIL_SMTP_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_SMTP_PORT
+        value: 587
+      - key: BASE_URL
+        fromService:
+          name: weather-notifier
+          type: web
+          property: url
+
+databases:
+  - name: weather-notifier-db
+    plan: free
+    databaseName: weather_api
+    user: postgres
