@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"net/smtp"
+	"strings"
 
 	"github.com/ihorlenko/weather_notifier/internal/config"
 )
@@ -26,28 +27,88 @@ func NewEmailService(cfg *config.Config) *EmailService {
 }
 
 func (s *EmailService) SendConfirmationEmail(email, city, token string) error {
-	subject := "Confirming subscription to Weather Notifier"
+	subject := "Confirm Your Weather Notifier Subscription"
 	confirmURL := fmt.Sprintf("%s/api/confirm/%s", s.baseURL, token)
 
-	body := fmt.Sprintf(`
-Hello!
-
-You have subscribed to the weather notifications for location: %s.
-
-To confirm your subscription visit the link:
-%s
-
-If it wasn't you, just ignore this letter.
-
-Sincerely yours,
-Weather Notifier Team
+	htmlBody := fmt.Sprintf(`
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Your Subscription</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #5b86e5 0%%, #36d1dc 100%%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #5b86e5 0%%, #36d1dc 100%%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        .footer {
+            background-color: #f5f5f5;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: #888888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Weather Notifier</h1>
+        </div>
+        <div class="content">
+            <p>Hello,</p>
+            <p>Thank you for subscribing to weather updates for <strong>%s</strong>.</p>
+            <p>To confirm your subscription, please click the button below:</p>
+            <div style="text-align: center;">
+                <a href="%s" class="button">Confirm Subscription</a>
+            </div>
+            <p>If you did not subscribe to this service, please ignore this email.</p>
+            <p>Best regards,<br>Weather Notifier Team</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2025 Weather Notifier by <a href="https://github.com/ihorlenko" style="color: #5b86e5;">ihorlenko</a></p>
+        </div>
+    </div>
+</body>
+</html>
 `, city, confirmURL)
 
-	return s.sendEmail(email, subject, body)
+	return s.sendHTMLEmail(email, subject, htmlBody)
 }
 
 func (s *EmailService) SendWeatherUpdate(email, city string, weather *WeatherData, unsubscribeToken string) error {
-	subject := fmt.Sprintf("Weather in %s", city)
+	subject := fmt.Sprintf("Weather Update for %s", city)
 	unsubscribeURL := fmt.Sprintf("%s/api/unsubscribe/%s", s.baseURL, unsubscribeToken)
 
 	weatherEmoji := getWeatherEmoji(weather.Description)
@@ -203,16 +264,25 @@ func (s *EmailService) SendWeatherUpdate(email, city string, weather *WeatherDat
 </html>
 `, tempColor, city, weatherEmoji, weather.Temperature, weather.Description, weather.Humidity, unsubscribeURL)
 
-	return s.sendEmail(email, subject, body)
+	return s.sendHTMLEmail(email, subject, htmlBody)
 }
 
-func (s *EmailService) sendEmail(to, subject, body string) error {
+func (s *EmailService) sendHTMLEmail(to, subject, htmlBody string) error {
 	auth := smtp.PlainAuth("", s.from, s.password, s.smtpHost)
 
-	msg := fmt.Sprintf("To: %s\r\n"+
-		"Subject: %s\r\n"+
-		"\r\n"+
-		"%s\r\n", to, subject, body)
+	headers := make(map[string]string)
+	headers["From"] = s.from
+	headers["To"] = to
+	headers["Subject"] = subject
+	headers["MIME-Version"] = "1.0"
+	headers["Content-Type"] = "text/html; charset=UTF-8"
+
+	var message string
+	for k, v := range headers {
+		message += fmt.Sprintf("%s: %s\r\n", k, v)
+	}
+
+	message += "\r\n" + htmlBody
 
 	addr := fmt.Sprintf("%s:%s", s.smtpHost, s.smtpPort)
 
