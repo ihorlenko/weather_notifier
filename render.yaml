@@ -1,6 +1,7 @@
 services:
   - type: web
     name: weather-notifier
+    plan: free
     env: docker
     repo: https://github.com/ihorlenko/weather_notifier
     dockerfilePath: ./Dockerfile
