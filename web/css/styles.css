@@ -146,6 +146,22 @@ footer {
     border-top: 1px solid #eee;
 }
 
+.github-link {
+    color: #5b86e5;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.github-link:hover {
+    color: #36d1dc;
+    text-decoration: underline;
+}
+
+footer p {
+    margin: 0;
+}
+
 @media (max-width: 600px) {
     .container {
         margin: 20px auto;
