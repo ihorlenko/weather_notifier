@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"net/url"
 	"regexp"
 
 	"github.com/gin-gonic/gin"
@@ -96,19 +97,20 @@ func (h *SubscriptionHandler) Subscribe(c *gin.Context) {
 func (h *SubscriptionHandler) Confirm(c *gin.Context) {
 	token := c.Param("token")
 	if token == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Token is required"})
+		redirectURL := "/?message_type=error&message=" + url.QueryEscape("Token is required")
+		c.Redirect(http.StatusFound, redirectURL)
 		return
 	}
 
 	err := h.subscriptionService.ConfirmSubscription(token)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		redirectURL := "/?message_type=error&message=" + url.QueryEscape(err.Error())
+		c.Redirect(http.StatusFound, redirectURL)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Subscription confirmed successfully",
-	})
+	redirectURL := "/?message_type=success&message=" + url.QueryEscape("Your subscription has been successfully confirmed!")
+	c.Redirect(http.StatusFound, redirectURL)
 }
 
 // Unsubscribe godoc
