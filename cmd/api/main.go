@@ -68,6 +68,8 @@ func main() {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.Static("/static", "./web/static")
+	router.Static("/css", "./web/css")
+	router.Static("/js", "./web/js")
 	router.StaticFile("/", "./web/index.html")
 
 	go func() {
