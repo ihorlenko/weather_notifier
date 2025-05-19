@@ -30,14 +30,20 @@
                 
                 <div class="form-group">
                     <label>Update Frequency</label>
-                    <div class="radio-group">
-                        <label class="radio">
+                    <div class="radio-options">
+                        <label class="radio-card">
                             <input type="radio" name="frequency" value="hourly">
-                            <span>Hourly</span>
+                            <div class="radio-content">
+                                <span class="radio-title">Hourly</span>
+                                <span class="radio-description">Updates every hour at XX:00</span>
+                            </div>
                         </label>
-                        <label class="radio">
+                        <label class="radio-card">
                             <input type="radio" name="frequency" value="daily" checked>
-                            <span>Daily</span>
+                            <div class="radio-content">
+                                <span class="radio-title">Daily</span>
+                                <span class="radio-description">Updates once a day at 09:00</span>
+                            </div>
                         </label>
                     </div>
                 </div>
